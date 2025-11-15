@@ -7,7 +7,8 @@ class OwnerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Menu Owner')),
-      body: const Center(child: Text('Halaman Owner — dapat melihat histori transaksi')),
+      body: const Center(
+          child: Text('Halaman Owner — dapat melihat histori transaksi')),
     );
   }
 }
