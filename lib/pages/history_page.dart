@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
-import 'futuristic_page.dart';
+import '../widgets/futuristic_page.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -57,8 +57,12 @@ class _HistoryPageState extends State<HistoryPage> {
         title: const Text('Hapus History'),
         content: const Text('Yakin ingin menghapus seluruh history transaksi?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Batal')),
-          TextButton(onPressed: () => Navigator.pop(c, true), child: const Text('Hapus')),
+          TextButton(
+              onPressed: () => Navigator.pop(c, false),
+              child: const Text('Batal')),
+          TextButton(
+              onPressed: () => Navigator.pop(c, true),
+              child: const Text('Hapus')),
         ],
       ),
     );
@@ -100,7 +104,10 @@ class _HistoryPageState extends State<HistoryPage> {
               children: [
                 Text(
                   "$name",
-                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -131,17 +138,18 @@ class _HistoryPageState extends State<HistoryPage> {
             children: [
               Text(
                 'Total: ${history.length}',
-                style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                    color: Colors.white70, fontWeight: FontWeight.w600),
               ),
               TextButton.icon(
                 onPressed: history.isEmpty ? null : _clearHistoryConfirm,
                 icon: const Icon(Icons.delete_forever, color: Colors.redAccent),
-                label: const Text('Kosongkan', style: TextStyle(color: Colors.redAccent)),
+                label: const Text('Kosongkan',
+                    style: TextStyle(color: Colors.redAccent)),
               )
             ],
           ),
           const SizedBox(height: 12),
-
           Expanded(
             child: history.isEmpty
                 ? const Center(

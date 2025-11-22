@@ -38,7 +38,6 @@ class FuturisticPage extends StatelessWidget {
               )
             : null,
       ),
-
       body: Stack(
         children: [
           // Background gradien futuristik

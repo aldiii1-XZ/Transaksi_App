@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'futuristic_page.dart';
+import '../widgets/futuristic_page.dart';
 
 class HomeUser extends StatefulWidget {
   const HomeUser({super.key});
@@ -53,11 +52,7 @@ class _HomeUserState extends State<HomeUser> {
     final cleaned = amountRaw.replaceAll('.', '');
     final number = int.tryParse(cleaned) ?? 0;
 
-    final item = {
-      "name": name,
-      "amount": number,
-      "date": now
-    };
+    final item = {"name": name, "amount": number, "date": now};
 
     transactions.add(item);
 
@@ -81,9 +76,7 @@ class _HomeUserState extends State<HomeUser> {
               labelStyle: TextStyle(color: Colors.white70),
             ),
           ),
-
           const SizedBox(height: 10),
-
           TextField(
             controller: amountController,
             keyboardType: TextInputType.number,
@@ -100,9 +93,7 @@ class _HomeUserState extends State<HomeUser> {
               );
             },
           ),
-
           const SizedBox(height: 20),
-
           ElevatedButton(
             onPressed: () {
               if (nameController.text.isNotEmpty &&
@@ -114,9 +105,7 @@ class _HomeUserState extends State<HomeUser> {
             },
             child: const Text("Simpan"),
           ),
-
           const SizedBox(height: 20),
-
           Expanded(
             child: ListView.builder(
               itemCount: filtered.length,
@@ -141,7 +130,8 @@ class _HomeUserState extends State<HomeUser> {
                       "Tanggal: ${item['date']}",
                       style: const TextStyle(color: Colors.white70),
                     ),
-                    leading: const Icon(Icons.payment, color: Colors.blueAccent),
+                    leading:
+                        const Icon(Icons.payment, color: Colors.blueAccent),
                   ),
                 );
               },

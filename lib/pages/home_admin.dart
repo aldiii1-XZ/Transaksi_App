@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'futuristic_page.dart';
 import 'history_page.dart';
+import '../widgets/futuristic_page.dart';
 
 class HomeAdmin extends StatelessWidget {
   const HomeAdmin({super.key});
@@ -18,7 +18,6 @@ class HomeAdmin extends StatelessWidget {
             style: TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 20),
-
           ElevatedButton(
             onPressed: () {
               Navigator.push(
