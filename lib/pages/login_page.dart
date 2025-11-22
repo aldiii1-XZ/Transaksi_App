@@ -1,117 +1,62 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
-import 'owner_page.dart';
+import '../widgets/futuristic_page.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
-}
+  Widget build(BuildContext context) {
+    return FuturisticPage(
+      title: "Masuk",
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
 
-class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+          TextField(
+            decoration: _field("Username"),
+            style: const TextStyle(color: Colors.white),
+          ),
+          const SizedBox(height: 20),
 
-  bool _isOwnerLogin = false;
-  bool _isPasswordVisible = false;
+          TextField(
+            decoration: _field("Password"),
+            obscureText: true,
+            style: const TextStyle(color: Colors.white),
+          ),
+          const SizedBox(height: 30),
 
-  void _login() {
-    String username = _usernameController.text.trim();
-    String password = _passwordController.text.trim();
-
-    if (_isOwnerLogin) {
-      // Login sebagai owner
-      if (username == 'owner' && password == '12345') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const OwnerPage()),
-        );
-      } else {
-        _showError('Username atau password owner salah');
-      }
-    } else {
-      // Login sebagai user biasa
-      if (username.isNotEmpty && password.isNotEmpty) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-      } else {
-        _showError('Silakan isi username dan password');
-      }
-    }
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withOpacity(0.15),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 14, horizontal: 45),
+            ),
+            onPressed: () {},
+            child: const Text(
+              "Masuk",
+              style: TextStyle(fontSize: 18),
+            ),
+          )
+        ],
+      ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Card(
-            elevation: 5,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Login Aplikasi Transaksi',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  SwitchListTile(
-                    title: const Text("Login sebagai Owner"),
-                    value: _isOwnerLogin,
-                    onChanged: (val) => setState(() => _isOwnerLogin = val),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: _usernameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Username',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: !_isPasswordVisible,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      border: const OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () => setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        }),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _login,
-                    child: const Text('Login'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+  InputDecoration _field(String text) {
+    return InputDecoration(
+      labelText: text,
+      labelStyle: const TextStyle(color: Colors.white70),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.white),
+        borderRadius: BorderRadius.circular(18),
       ),
     );
   }
