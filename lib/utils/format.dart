@@ -1,13 +1,21 @@
 import 'package:intl/intl.dart';
 
-String formatRupiah(dynamic value) {
-  if (value == null) return '0';
-  try {
-    final s = value.toString().replaceAll(RegExp(r'[^0-9]'), '');
-    if (s.isEmpty) return '0';
-    final n = int.parse(s);
-    return NumberFormat('#,###', 'id_ID').format(n).replaceAll(',', '.');
-  } catch (e) {
-    return value.toString();
-  }
+/// Format angka menjadi Rupiah dengan titik
+/// Contoh: 10000 → 10.000
+String formatRupiah(String raw) {
+  if (raw.isEmpty) return "";
+
+  // Hapus titik lama
+  raw = raw.replaceAll('.', '');
+
+  // Jika bukan angka → langsung kembalikan raw
+  final number = int.tryParse(raw);
+  if (number == null) return raw;
+
+  return NumberFormat.decimalPattern('id').format(number);
+}
+
+/// Convert angka mentah ke tampilan Rupiah
+String formatRupiahInt(int value) {
+  return NumberFormat.decimalPattern('id').format(value);
 }
