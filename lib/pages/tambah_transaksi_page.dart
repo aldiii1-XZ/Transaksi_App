@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/format.dart';
 
 class TambahTransaksiPage extends StatefulWidget {
   const TambahTransaksiPage({super.key});
@@ -12,7 +15,56 @@ class _TambahTransaksiPageState extends State<TambahTransaksiPage> {
   final TextEditingController namaController = TextEditingController();
   final TextEditingController nominalController = TextEditingController();
 
-  final formatter = NumberFormat.decimalPattern('id');
+  bool isSaving = false;
+
+  @override
+  void dispose() {
+    namaController.dispose();
+    nominalController.dispose();
+    super.dispose();
+  }
+
+  Future<void> saveTransaction() async {
+    if (namaController.text.isEmpty || nominalController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Harap isi semua data terlebih dahulu")),
+      );
+      return;
+    }
+
+    final rawNominal = nominalController.text.replaceAll('.', '');
+    final parsedNominal = int.tryParse(rawNominal);
+
+    if (parsedNominal == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Nominal tidak valid")),
+      );
+      return;
+    }
+
+    setState(() => isSaving = true);
+
+    final newItem = {
+      "name": namaController.text.trim(),
+      "amount": parsedNominal,
+      "date": DateFormat("dd MMM yyyy, HH:mm").format(DateTime.now()),
+    };
+
+    final prefs = await SharedPreferences.getInstance();
+    final existing = prefs.getStringList("history") ?? [];
+    existing.add(jsonEncode(newItem));
+    await prefs.setStringList("history", existing);
+
+    if (!mounted) return;
+
+    setState(() => isSaving = false);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Transaksi berhasil disimpan")),
+    );
+
+    Navigator.pop(context, true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,15 +92,7 @@ class _TambahTransaksiPageState extends State<TambahTransaksiPage> {
                 border: OutlineInputBorder(),
               ),
               onChanged: (value) {
-                String raw = value.replaceAll('.', '');
-
-                if (raw.isEmpty) {
-                  nominalController.text = '';
-                  return;
-                }
-
-                String formatted = formatter.format(int.parse(raw));
-
+                final formatted = formatRupiah(value);
                 nominalController.value = TextEditingValue(
                   text: formatted,
                   selection: TextSelection.collapsed(offset: formatted.length),
@@ -59,24 +103,14 @@ class _TambahTransaksiPageState extends State<TambahTransaksiPage> {
             const SizedBox(height: 20),
 
             ElevatedButton(
-              onPressed: () {
-                if (namaController.text.isEmpty ||
-                    nominalController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text("Harap isi semua data terlebih dahulu")),
-                  );
-                  return;
-                }
-
-                // ACTION SIMPAN — nanti kamu sambungkan ke save real database
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Transaksi berhasil disimpan")),
-                );
-
-                Navigator.pop(context);
-              },
-              child: const Text("Simpan"),
+              onPressed: isSaving ? null : saveTransaction,
+              child: isSaving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text("Simpan"),
             )
           ],
         ),

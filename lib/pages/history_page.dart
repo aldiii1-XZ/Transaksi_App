@@ -29,7 +29,9 @@ class _HistoryPageState extends State<HistoryPage> {
     for (final item in rawList) {
       try {
         final data = jsonDecode(item);
-        temp.add(Map<String, dynamic>.from(data));
+        final map = Map<String, dynamic>.from(data);
+        map['amount'] = _parseAmount(map['amount']);
+        temp.add(map);
       } catch (_) {}
     }
 
@@ -37,6 +39,15 @@ class _HistoryPageState extends State<HistoryPage> {
     setState(() {
       history = temp.reversed.toList();
     });
+  }
+
+  int _parseAmount(dynamic raw) {
+    if (raw is int) return raw;
+    if (raw is String) {
+      final cleaned = raw.replaceAll('.', '').replaceAll(',', '');
+      return int.tryParse(cleaned) ?? 0;
+    }
+    return 0;
   }
 
   Future<void> clearAll() async {
