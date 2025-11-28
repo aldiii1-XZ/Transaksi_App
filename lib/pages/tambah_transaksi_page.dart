@@ -70,49 +70,69 @@ class _TambahTransaksiPageState extends State<TambahTransaksiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Tambah Transaksi")),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            TextField(
-              controller: namaController,
-              decoration: const InputDecoration(
-                labelText: "Nama Transaksi",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Nominal otomatis jadi format 12.000
-            TextField(
-              controller: nominalController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "Nominal",
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                final formatted = formatRupiah(value);
-                nominalController.value = TextEditingValue(
-                  text: formatted,
-                  selection: TextSelection.collapsed(offset: formatted.length),
-                );
-              },
-            ),
-
-            const SizedBox(height: 20),
-
-            ElevatedButton(
-              onPressed: isSaving ? null : saveTransaction,
-              child: isSaving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text("Simpan"),
-            )
-          ],
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+              return SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomInset),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
+                        controller: namaController,
+                        decoration: const InputDecoration(
+                          labelText: "Nama Transaksi",
+                          border: OutlineInputBorder(),
+                        ),
+                        textInputAction: TextInputAction.next,
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: nominalController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: "Nominal",
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          final formatted = formatRupiah(value);
+                          nominalController.value = TextEditingValue(
+                            text: formatted,
+                            selection:
+                                TextSelection.collapsed(offset: formatted.length),
+                          );
+                        },
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => FocusScope.of(context).unfocus(),
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: isSaving ? null : saveTransaction,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          child: isSaving
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Text("Simpan"),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

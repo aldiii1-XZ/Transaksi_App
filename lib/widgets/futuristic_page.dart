@@ -17,19 +17,16 @@ class FuturisticPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xff0A0F1F),
-
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-
         leading: showBack
             ? IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
-
         title: Text(
           title,
           style: GoogleFonts.poppins(
@@ -38,21 +35,22 @@ class FuturisticPage extends StatelessWidget {
           ),
         ),
       ),
-
-      body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xff0A0F1F),
-              Color(0xff131B2E),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xff0A0F1F),
+                Color(0xff131B2E),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
+          child: child,
         ),
-        child: child,
       ),
     );
   }

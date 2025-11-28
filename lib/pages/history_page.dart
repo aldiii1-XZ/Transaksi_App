@@ -125,10 +125,10 @@ class _HistoryPageState extends State<HistoryPage> {
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withValues(alpha: 0.1),
                           ),
                         ),
                         child: Row(
@@ -136,7 +136,7 @@ class _HistoryPageState extends State<HistoryPage> {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: Colors.amber.withOpacity(0.25),
+                                color: Colors.amber.withValues(alpha: 0.25),
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: const Icon(

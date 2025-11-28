@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -62,6 +63,12 @@ class _HomePageState extends State<HomePage> {
   String get _lastTransactionTitle =>
       _history.isEmpty ? "Belum ada transaksi" : _history.first['name'] as String;
 
+  List<int> get _recentAmounts => _history
+      .take(7)
+      .map((item) => (item['amount'] ?? 0) as int)
+      .where((value) => value >= 0)
+      .toList();
+
   Future<void> _openTambahTransaksi() async {
     final result = await Navigator.push(
       context,
@@ -122,48 +129,61 @@ class _HomePageState extends State<HomePage> {
             end: Alignment.bottomRight,
           ),
         ),
-        child: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: _loadHistory,
-            color: accent,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
-              children: [
-                _HeroCard(
-                  background: surface,
-                  accent: accent,
-                  totalAmount: _totalAmount,
-                  totalTransactions: _totalTransactions,
-                  lastTransaction: _lastTransactionTitle,
-                  onAddTap: _openTambahTransaksi,
+        child: Stack(
+          children: [
+            const _BrandBackdrop(),
+            SafeArea(
+              child: RefreshIndicator(
+                onRefresh: _loadHistory,
+                color: accent,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
+                  children: [
+                    _HeroCard(
+                      background: surface,
+                      accent: accent,
+                      totalAmount: _totalAmount,
+                      totalTransactions: _totalTransactions,
+                      lastTransaction: _lastTransactionTitle,
+                      onAddTap: _openTambahTransaksi,
+                    ),
+                    const SizedBox(height: 18),
+                    _QuickActions(
+                      surface: surface,
+                      accent: accent,
+                      onTambah: _openTambahTransaksi,
+                      onHistory: _openHistory,
+                    ),
+                    const SizedBox(height: 18),
+                    _StatsRow(
+                      surface: surface,
+                      accent: accent,
+                      totalAmount: _totalAmount,
+                      totalTransactions: _totalTransactions,
+                      lastTransaction: _lastTransactionTitle,
+                    ),
+                    const SizedBox(height: 18),
+                    _MomentumPanel(
+                      surface: surface,
+                      accent: accent,
+                      amounts: _recentAmounts,
+                      onAdd: _openTambahTransaksi,
+                      onHistory: _openHistory,
+                    ),
+                    const SizedBox(height: 18),
+                    _RecentList(
+                      surface: surface,
+                      accent: accent,
+                      loading: _loading,
+                      history: _history,
+                      onShowAll: _openHistory,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 18),
-                _QuickActions(
-                  surface: surface,
-                  accent: accent,
-                  onTambah: _openTambahTransaksi,
-                  onHistory: _openHistory,
-                ),
-                const SizedBox(height: 18),
-                _StatsRow(
-                  surface: surface,
-                  accent: accent,
-                  totalAmount: _totalAmount,
-                  totalTransactions: _totalTransactions,
-                  lastTransaction: _lastTransactionTitle,
-                ),
-                const SizedBox(height: 18),
-                _RecentList(
-                  surface: surface,
-                  accent: accent,
-                  loading: _loading,
-                  history: _history,
-                  onShowAll: _openHistory,
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -192,11 +212,11 @@ class _HeroCard extends StatelessWidget {
     final total = formatRupiahInt(totalAmount);
     return Container(
       padding: const EdgeInsets.all(20),
-      height: 180,
+      height: 200,
       decoration: BoxDecoration(
-        color: background.withOpacity(0.65),
+        color: background.withValues(alpha: 0.65),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         gradient: const LinearGradient(
           colors: [Color(0xFF1D2B64), Color(0xFF1B2240)],
           begin: Alignment.topLeft,
@@ -204,7 +224,7 @@ class _HeroCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.35),
+            color: Colors.black.withValues(alpha: 0.35),
             blurRadius: 20,
             offset: const Offset(0, 10),
           )
@@ -220,7 +240,7 @@ class _HeroCard extends StatelessWidget {
               height: 160,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.04),
+                color: Colors.white.withValues(alpha: 0.04),
               ),
             ),
           ),
@@ -232,67 +252,74 @@ class _HeroCard extends StatelessWidget {
               height: 140,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: accent.withOpacity(0.08),
+                color: accent.withValues(alpha: 0.08),
               ),
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "Ringkasan Hari Ini",
-                style: GoogleFonts.poppins(
-                  color: Colors.white.withOpacity(0.9),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                "Rp $total",
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.3,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _MiniPill(
-                    label: "$totalTransactions transaksi",
-                    icon: Icons.check_circle_outline,
-                    accent: accent,
+                  Text(
+                    "Ringkasan Hari Ini",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  _MiniPill(
-                    label: lastTransaction,
-                    icon: Icons.flash_on_rounded,
-                    accent: Colors.white70,
+                  const SizedBox(height: 6),
+                  Text(
+                    "Rp $total",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      _MiniPill(
+                        label: "$totalTransactions transaksi",
+                        icon: Icons.check_circle_outline,
+                        accent: accent,
+                      ),
+                      const SizedBox(width: 8),
+                      _MiniPill(
+                        label: lastTransaction,
+                        icon: Icons.flash_on_rounded,
+                        accent: Colors.white70,
+                      ),
+                    ],
                   ),
                 ],
               ),
-              const Spacer(),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: ElevatedButton.icon(
-                  onPressed: onAddTap,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: accent,
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: onAddTap,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: accent,
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 16,
-                    ),
+                    icon: const Icon(Icons.add_rounded),
+                    label: const Text("Tambah transaksi"),
                   ),
-                  icon: const Icon(Icons.add_rounded),
-                  label: const Text("Tambah transaksi"),
-                ),
-              )
+                ],
+              ),
             ],
           ),
         ],
@@ -368,16 +395,16 @@ class _ActionTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: surface.withOpacity(0.75),
+          color: surface.withValues(alpha: 0.75),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: accent.withOpacity(0.15),
+                color: accent.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: accent),
@@ -480,9 +507,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: surface.withOpacity(0.8),
+        color: surface.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -490,7 +517,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: accent.withOpacity(0.15),
+              color: accent.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: accent, size: 20),
@@ -516,6 +543,387 @@ class _StatCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _MomentumPanel extends StatelessWidget {
+  final Color surface;
+  final Color accent;
+  final List<int> amounts;
+  final VoidCallback onAdd;
+  final VoidCallback onHistory;
+
+  const _MomentumPanel({
+    required this.surface,
+    required this.accent,
+    required this.amounts,
+    required this.onAdd,
+    required this.onHistory,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasData = amounts.isNotEmpty;
+    final total = amounts.fold<int>(0, (sum, value) => sum + value);
+    final avg = hasData ? (total / amounts.length).round() : 0;
+    final best = hasData ? amounts.reduce(max) : 0;
+    final momentum = hasData && amounts.length > 1
+        ? ((amounts.first - amounts.last) / max(amounts.last, 1)) * 100
+        : 0.0;
+    final trendingUp = momentum >= 0;
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1E2A55), Color(0xFF111A33)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: 0.18),
+            blurRadius: 26,
+            offset: const Offset(0, 16),
+          )
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Momentum",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    hasData
+                        ? "7 transaksi terakhir, real time"
+                        : "Belum ada data, ayo isi satu transaksi",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              IconButton(
+                onPressed: hasData ? onHistory : onAdd,
+                icon: Icon(
+                  hasData ? Icons.auto_graph_rounded : Icons.bolt_rounded,
+                  color: Colors.white,
+                ),
+                tooltip: hasData ? "Buka history" : "Tambah transaksi",
+              )
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 140,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: surface.withValues(alpha: 0.45),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.04)),
+                ),
+                child: hasData
+                    ? _Sparkline(amounts: amounts, accent: accent)
+                    : Center(
+                        child: ElevatedButton.icon(
+                          onPressed: onAdd,
+                          icon: const Icon(Icons.add_rounded),
+                          label: const Text("Tambah transaksi pertama"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: accent,
+                            foregroundColor: Colors.black,
+                          ),
+                        ),
+                      ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 700),
+            tween: Tween(begin: 0, end: 1),
+            builder: (context, value, _) {
+              final displayMomentum = (momentum * value).roundToDouble();
+              return Row(
+                children: [
+                  Icon(
+                    trendingUp ? Icons.trending_up : Icons.trending_down,
+                    color: trendingUp ? Colors.greenAccent : Colors.orangeAccent,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "${trendingUp ? 'Laju naik' : 'Laju turun'} ${displayMomentum.abs().toStringAsFixed(0)}%",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              _MetricChip(
+                label: "Total 7 terakhir",
+                value: "Rp ${formatRupiahInt(total)}",
+                color: accent,
+              ),
+              const SizedBox(width: 8),
+              _MetricChip(
+                label: "Rata-rata",
+                value: "Rp ${formatRupiahInt(avg)}",
+                color: Colors.cyanAccent,
+              ),
+              const SizedBox(width: 8),
+              _MetricChip(
+                label: "Puncak",
+                value: "Rp ${formatRupiahInt(best)}",
+                color: Colors.amberAccent,
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class _Sparkline extends StatelessWidget {
+  final List<int> amounts;
+  final Color accent;
+
+  const _Sparkline({required this.amounts, required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: _SparklinePainter(amounts, accent),
+      child: const SizedBox.expand(),
+    );
+  }
+}
+
+class _SparklinePainter extends CustomPainter {
+  final List<int> amounts;
+  final Color accent;
+
+  _SparklinePainter(this.amounts, this.accent);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (amounts.isEmpty) return;
+
+    final maxValue = amounts.reduce(max).toDouble();
+    final minValue = amounts.reduce(min).toDouble();
+    final range = max(maxValue - minValue, 1);
+    final singlePoint = amounts.length == 1;
+    final step = singlePoint ? 0.0 : size.width / (amounts.length - 1);
+
+    final path = Path();
+    final fillPath = Path();
+    final points = <Offset>[];
+
+    for (var i = 0; i < amounts.length; i++) {
+      final x = singlePoint ? size.width / 2 : step * i.toDouble();
+      final normalized = (amounts[i] - minValue) / range;
+      final y = size.height - (normalized * size.height);
+      points.add(Offset(x, y));
+    }
+
+    for (var i = 0; i < points.length; i++) {
+      if (i == 0) {
+        path.moveTo(points[i].dx, points[i].dy);
+        fillPath.moveTo(points[i].dx, size.height);
+        fillPath.lineTo(points[i].dx, points[i].dy);
+      } else {
+        path.lineTo(points[i].dx, points[i].dy);
+        fillPath.lineTo(points[i].dx, points[i].dy);
+      }
+    }
+    fillPath.lineTo(points.last.dx, size.height);
+    fillPath.close();
+
+    final paintFill = Paint()
+      ..shader = LinearGradient(
+        colors: [accent.withValues(alpha: 0.3), Colors.transparent],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+    canvas.drawPath(fillPath, paintFill);
+
+    final paintLine = Paint()
+      ..color = accent
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round;
+    canvas.drawPath(path, paintLine);
+
+    final glowPaint = Paint()
+      ..color = accent.withValues(alpha: 0.6)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
+    canvas.drawCircle(points.last, 6, glowPaint);
+    canvas.drawCircle(points.last, 3, Paint()..color = Colors.white);
+  }
+
+  @override
+  bool shouldRepaint(covariant _SparklinePainter oldDelegate) {
+    return oldDelegate.amounts != amounts || oldDelegate.accent != accent;
+  }
+}
+
+class _MetricChip extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _MetricChip({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                color: Colors.white60,
+                fontSize: 11,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: GoogleFonts.poppins(
+                color: color,
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BrandBackdrop extends StatelessWidget {
+  const _BrandBackdrop();
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: CustomPaint(
+        painter: _BrandBackdropPainter(),
+        size: Size.infinite,
+      ),
+    );
+  }
+}
+
+class _BrandBackdropPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final bgPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          const Color(0xFF0B1023).withValues(alpha: 0.0),
+          const Color(0xFF1E2A55).withValues(alpha: 0.12),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(rect);
+    canvas.drawRect(rect, bgPaint);
+
+    final glowShader = RadialGradient(
+      colors: [
+        const Color(0xFF6BD1FF).withValues(alpha: 0.12),
+        Colors.transparent,
+      ],
+      stops: const [0.0, 1.0],
+    ).createShader(Rect.fromCircle(
+      center: Offset(size.width * 0.25, size.height * 0.35),
+      radius: size.width * 0.45,
+    ));
+    canvas.drawRect(rect, Paint()..shader = glowShader);
+
+    final glowShader2 = RadialGradient(
+      colors: [
+        Colors.purpleAccent.withValues(alpha: 0.09),
+        Colors.transparent,
+      ],
+      stops: const [0.0, 1.0],
+    ).createShader(Rect.fromCircle(
+      center: Offset(size.width * 0.85, size.height * 0.55),
+      radius: size.width * 0.5,
+    ));
+    canvas.drawRect(rect, Paint()..shader = glowShader2);
+
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: "Aldi Yonatan",
+        style: GoogleFonts.montserrat(
+          fontSize: size.width * 0.12,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 2,
+          foreground: Paint()
+            ..shader = LinearGradient(
+              colors: [
+                const Color(0xFF6BD1FF).withValues(alpha: 0.22),
+                Colors.white.withValues(alpha: 0.08),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ).createShader(rect),
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: size.width * 0.9);
+
+    final textOffset = Offset(
+      (size.width - textPainter.width) / 2,
+      (size.height - textPainter.height) / 2,
+    );
+
+    canvas.save();
+    canvas.translate(0, -30);
+    canvas.skew(-0.08, 0);
+    textPainter.paint(canvas, textOffset);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _RecentList extends StatelessWidget {
@@ -568,9 +976,9 @@ class _RecentList extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: surface.withOpacity(0.7),
+              color: surface.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.05)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
             ),
             child: Row(
               children: [
@@ -578,7 +986,7 @@ class _RecentList extends StatelessWidget {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                   ),
                   child: const Icon(Icons.inbox_rounded, color: Colors.white70),
                 ),
@@ -602,16 +1010,16 @@ class _RecentList extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: surface.withOpacity(0.78),
+                  color: surface.withValues(alpha: 0.78),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.white.withOpacity(0.05)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: accent.withOpacity(0.18),
+                        color: accent.withValues(alpha: 0.18),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -678,9 +1086,9 @@ class _MiniPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withOpacity(0.12)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

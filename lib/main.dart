@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'pages/home_page.dart';
+import 'package:flutter/services.dart';
+import 'pages/role_select_page.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
+    ),
+  );
   runApp(const TransaksiApp());
 }
 
@@ -33,7 +43,7 @@ class TransaksiApp extends StatelessWidget {
         textTheme: GoogleFonts.poppinsTextTheme(baseTheme.textTheme)
             .apply(bodyColor: Colors.white, displayColor: Colors.white),
       ),
-      home: const HomePage(),
+      home: const RoleSelectPage(),
     );
   }
 }
