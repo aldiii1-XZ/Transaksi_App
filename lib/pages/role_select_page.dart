@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'home_admin.dart';
 import 'owner_page.dart';
 import 'home_page.dart';
-import 'login_page.dart';
 
 class RoleSelectPage extends StatelessWidget {
   const RoleSelectPage({super.key});
@@ -57,17 +56,10 @@ class RoleSelectPage extends StatelessWidget {
                       ),
                       _RoleCard(
                         title: "User",
-                        subtitle: "Catat transaksi harian dengan tampilan modern.",
+                        subtitle: "Catat transaksi harian.",
                         icon: Icons.person_pin_circle_rounded,
                         color: Colors.greenAccent,
                         onTap: () => _open(context, const HomePage()),
-                      ),
-                      _RoleCard(
-                        title: "Masuk / Login",
-                        subtitle: "Gunakan kredensial jika diperlukan.",
-                        icon: Icons.lock_open_rounded,
-                        color: Colors.purpleAccent,
-                        onTap: () => _open(context, const LoginPage()),
                       ),
                     ],
                   ),
