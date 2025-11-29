@@ -1006,6 +1006,8 @@ class _RecentList extends StatelessWidget {
               final nominal = formatRupiahInt((item['amount'] ?? 0) as int);
               final date = item['date']?.toString() ?? "";
               final name = item['name']?.toString() ?? "Tanpa nama";
+              final category = item['category']?.toString();
+              final important = item['important'] == true;
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(14),
@@ -1037,15 +1039,71 @@ class _RecentList extends StatelessWidget {
                             name,
                             style: GoogleFonts.poppins(
                               color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            date,
-                            style: GoogleFonts.poppins(
-                              color: Colors.white60,
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            if (category != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  category,
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            if (important) ...[
+                              if (category != null) const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.amber.withValues(alpha: 0.3),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.star_rounded,
+                                      color: Colors.black87,
+                                      size: 14,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      "Penting",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          date,
+                          style: GoogleFonts.poppins(
+                            color: Colors.white60,
                               fontSize: 12,
                             ),
                           ),

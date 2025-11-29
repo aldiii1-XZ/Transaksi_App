@@ -120,6 +120,10 @@ class _HistoryPageState extends State<HistoryPage> {
 
                       final nominal =
                           formatRupiahInt(item['amount'] as int);
+                      final category =
+                          (item['category'] ?? "Lainnya").toString();
+                      final note = item['note']?.toString();
+                      final important = item['important'] == true;
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
@@ -128,7 +132,9 @@ class _HistoryPageState extends State<HistoryPage> {
                           color: Colors.white.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.1),
+                            color: important
+                                ? Colors.amber.withValues(alpha: 0.3)
+                                : Colors.white.withValues(alpha: 0.1),
                           ),
                         ),
                         child: Row(
@@ -136,11 +142,15 @@ class _HistoryPageState extends State<HistoryPage> {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: Colors.amber.withValues(alpha: 0.25),
+                                color: important
+                                    ? Colors.amber.withValues(alpha: 0.35)
+                                    : Colors.amber.withValues(alpha: 0.25),
                                 borderRadius: BorderRadius.circular(14),
                               ),
-                              child: const Icon(
-                                Icons.history_rounded,
+                              child: Icon(
+                                important
+                                    ? Icons.star_rounded
+                                    : Icons.history_rounded,
                                 color: Colors.amber,
                                 size: 26,
                               ),
@@ -159,13 +169,56 @@ class _HistoryPageState extends State<HistoryPage> {
                                     ),
                                   ),
                                   const SizedBox(height: 5),
-                                  Text(
-                                    "Rp $nominal",
-                                    style: const TextStyle(
-                                      color: Colors.greenAccent,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                    ),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 6,
+                                    children: [
+                                      Chip(
+                                        label: Text(category),
+                                        labelStyle: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        backgroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 0,
+                                        ),
+                                      ),
+                                      Chip(
+                                        avatar: const Icon(
+                                          Icons.payments_rounded,
+                                          size: 18,
+                                          color: Colors.white,
+                                        ),
+                                        label: Text(
+                                          "Rp $nominal",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        backgroundColor:
+                                            Colors.green.withValues(alpha: 0.35),
+                                      ),
+                                      if (important)
+                                        Chip(
+                                          avatar: const Icon(
+                                            Icons.priority_high,
+                                            size: 18,
+                                            color: Colors.white,
+                                          ),
+                                          label: const Text(
+                                            "Penting",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          backgroundColor: Colors.amber
+                                              .withValues(alpha: 0.45),
+                                        ),
+                                    ],
                                   ),
                                   const SizedBox(height: 3),
                                   Text(
@@ -174,7 +227,31 @@ class _HistoryPageState extends State<HistoryPage> {
                                       color: Colors.white70,
                                       fontSize: 12,
                                     ),
-                                  )
+                                  ),
+                                  if (note != null && note.isNotEmpty) ...[
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Icon(
+                                          Icons.notes_rounded,
+                                          color: Colors.white70,
+                                          size: 16,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Text(
+                                            note,
+                                            style: const TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ]
                                 ],
                               ),
                             ),
