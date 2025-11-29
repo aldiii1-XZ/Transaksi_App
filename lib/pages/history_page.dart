@@ -1,11 +1,17 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/user_role.dart';
 import '../utils/format.dart';
 import '../widgets/futuristic_page.dart';
 
 class HistoryPage extends StatefulWidget {
-  const HistoryPage({super.key});
+  final UserRole role;
+
+  const HistoryPage({
+    super.key,
+    this.role = UserRole.user,
+  });
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
@@ -51,6 +57,8 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Future<void> clearAll() async {
+    if (!_canManage) return;
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -78,6 +86,13 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
+  bool get _canManage =>
+      widget.role == UserRole.admin || widget.role == UserRole.owner;
+
+  String _roleLabel(dynamic raw) {
+    return userRoleFromString(raw?.toString()).label;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FuturisticPage(
@@ -89,11 +104,11 @@ class _HistoryPageState extends State<HistoryPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Total: ${history.length}",
+                "Total: ${history.length} (${widget.role.label})",
                 style: const TextStyle(color: Colors.white70),
               ),
               TextButton.icon(
-                onPressed: history.isEmpty ? null : clearAll,
+                onPressed: history.isEmpty || !_canManage ? null : clearAll,
                 icon: const Icon(Icons.delete_forever, color: Colors.redAccent),
                 label: const Text(
                   "Kosongkan",
@@ -124,6 +139,9 @@ class _HistoryPageState extends State<HistoryPage> {
                           (item['category'] ?? "Lainnya").toString();
                       final note = item['note']?.toString();
                       final important = item['important'] == true;
+                      final createdBy = _roleLabel(
+                        item['createdBy'] ?? item['role'],
+                      );
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
@@ -200,6 +218,15 @@ class _HistoryPageState extends State<HistoryPage> {
                                         ),
                                         backgroundColor:
                                             Colors.green.withValues(alpha: 0.35),
+                                      ),
+                                      Chip(
+                                        label: Text(createdBy),
+                                        labelStyle: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        backgroundColor:
+                                            Colors.blueGrey.withValues(alpha: 0.4),
                                       ),
                                       if (important)
                                         Chip(

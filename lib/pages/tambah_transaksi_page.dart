@@ -2,10 +2,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/user_role.dart';
 import '../utils/format.dart';
 
 class TambahTransaksiPage extends StatefulWidget {
-  const TambahTransaksiPage({super.key});
+  final UserRole role;
+
+  const TambahTransaksiPage({
+    super.key,
+    this.role = UserRole.user,
+  });
 
   @override
   State<TambahTransaksiPage> createState() => _TambahTransaksiPageState();
@@ -69,6 +75,7 @@ class _TambahTransaksiPageState extends State<TambahTransaksiPage> {
           ? null
           : catatanController.text.trim(),
       "important": tandaiPenting,
+      "createdBy": widget.role.name,
       "createdAt": DateTime.now().toIso8601String(),
     };
 

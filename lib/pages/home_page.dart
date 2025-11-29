@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/user_role.dart';
 import '../utils/format.dart';
 import 'tambah_transaksi_page.dart';
 import 'history_page.dart';
@@ -72,7 +73,9 @@ class _HomePageState extends State<HomePage> {
   Future<void> _openTambahTransaksi() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const TambahTransaksiPage()),
+      MaterialPageRoute(
+        builder: (_) => const TambahTransaksiPage(role: UserRole.user),
+      ),
     );
 
     if (result == true) {
@@ -83,7 +86,9 @@ class _HomePageState extends State<HomePage> {
   void _openHistory() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const HistoryPage()),
+      MaterialPageRoute(
+        builder: (_) => const HistoryPage(role: UserRole.user),
+      ),
     );
   }
 
