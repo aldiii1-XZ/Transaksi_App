@@ -32,11 +32,13 @@ class _HistoryPageState extends State<HistoryPage> {
 
     final temp = <Map<String, dynamic>>[];
 
-    for (final item in rawList) {
+    for (var i = 0; i < rawList.length; i++) {
+      final item = rawList[i];
       try {
         final data = jsonDecode(item);
         final map = Map<String, dynamic>.from(data);
         map['amount'] = _parseAmount(map['amount']);
+        map['_storageIndex'] = i; // keep pointer to original list position
         temp.add(map);
       } catch (_) {}
     }
@@ -91,6 +93,82 @@ class _HistoryPageState extends State<HistoryPage> {
 
   String _roleLabel(dynamic raw) {
     return userRoleFromString(raw?.toString()).label;
+  }
+
+  Future<void> _deleteItem(Map<String, dynamic> item) async {
+    if (!_canManage) return;
+
+    final name = item['name']?.toString() ?? 'transaksi';
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Hapus transaksi ini?"),
+        content: Text(
+          "Hapus \"$name\" dari history? Cocok jika ada input yang salah.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Batal"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              "Hapus",
+              style: TextStyle(color: Colors.redAccent),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final rawList = prefs.getStringList("history") ?? [];
+    final createdAt = item['createdAt']?.toString();
+    final storageIndex = item['_storageIndex'] is int
+        ? item['_storageIndex'] as int
+        : null;
+
+    var removed = false;
+    final updated = <String>[];
+
+    for (var i = 0; i < rawList.length; i++) {
+      final raw = rawList[i];
+      var match = false;
+
+      try {
+        final decoded = jsonDecode(raw);
+        final map = Map<String, dynamic>.from(decoded);
+        final rawCreatedAt = map['createdAt']?.toString();
+        if (createdAt != null && rawCreatedAt == createdAt) {
+          match = true;
+        }
+      } catch (_) {}
+
+      if (!match &&
+          createdAt == null &&
+          storageIndex != null &&
+          storageIndex == i) {
+        match = true;
+      }
+
+      if (!removed && match) {
+        removed = true;
+        continue;
+      }
+
+      updated.add(raw);
+    }
+
+    await prefs.setStringList("history", updated);
+    await loadHistory();
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Transaksi dihapus")),
+    );
   }
 
   @override
@@ -150,11 +228,11 @@ class _HistoryPageState extends State<HistoryPage> {
                           color: Colors.white.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: important
-                                ? Colors.amber.withValues(alpha: 0.3)
-                                : Colors.white.withValues(alpha: 0.1),
-                          ),
-                        ),
+                                      color: important
+                                          ? Colors.amber.withValues(alpha: 0.3)
+                                          : Colors.white.withValues(alpha: 0.1),
+                                    ),
+                                  ),
                         child: Row(
                           children: [
                             Container(
@@ -178,13 +256,32 @@ class _HistoryPageState extends State<HistoryPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    item['name'],
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          item['name'],
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      if (_canManage)
+                                        IconButton(
+                                          visualDensity:
+                                              VisualDensity.compact,
+                                          onPressed: () => _deleteItem(item),
+                                          icon: const Icon(
+                                            Icons.delete_outline_rounded,
+                                            color: Colors.redAccent,
+                                          ),
+                                          tooltip: "Hapus transaksi",
+                                        ),
+                                    ],
                                   ),
                                   const SizedBox(height: 5),
                                   Wrap(
