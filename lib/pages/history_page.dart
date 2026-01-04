@@ -173,6 +173,10 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    const textPrimary = Color(0xFF1F2933);
+    const textSecondary = Color(0xFF52616B);
+    const surface = Color(0xFFF6F8FB);
+    const accent = Color(0xFF2ECC71);
     return FuturisticPage(
       title: "History Transaksi",
       showBack: true,
@@ -183,7 +187,7 @@ class _HistoryPageState extends State<HistoryPage> {
             children: [
               Text(
                 "Total: ${history.length} (${widget.role.label})",
-                style: const TextStyle(color: Colors.white70),
+                style: const TextStyle(color: textSecondary),
               ),
               TextButton.icon(
                 onPressed: history.isEmpty || !_canManage ? null : clearAll,
@@ -203,7 +207,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 ? const Center(
                     child: Text(
                       "Belum ada history",
-                      style: TextStyle(color: Colors.white70),
+                      style: TextStyle(color: textSecondary),
                     ),
                   )
                 : ListView.builder(
@@ -225,12 +229,12 @@ class _HistoryPageState extends State<HistoryPage> {
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
+                          color: surface,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                                       color: important
                                           ? Colors.amber.withValues(alpha: 0.3)
-                                          : Colors.white.withValues(alpha: 0.1),
+                                          : Colors.black.withValues(alpha: 0.04),
                                     ),
                                   ),
                         child: Row(
@@ -264,7 +268,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                         child: Text(
                                           item['name'],
                                           style: const TextStyle(
-                                            color: Colors.white,
+                                            color: textPrimary,
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -291,7 +295,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                       Chip(
                                         label: Text(category),
                                         labelStyle: const TextStyle(
-                                          color: Colors.black,
+                                          color: textPrimary,
                                           fontWeight: FontWeight.w600,
                                         ),
                                         backgroundColor: Colors.white,
@@ -304,38 +308,38 @@ class _HistoryPageState extends State<HistoryPage> {
                                         avatar: const Icon(
                                           Icons.payments_rounded,
                                           size: 18,
-                                          color: Colors.white,
+                                          color: textPrimary,
                                         ),
                                         label: Text(
                                           "Rp $nominal",
                                           style: const TextStyle(
-                                            color: Colors.white,
+                                            color: textPrimary,
                                             fontWeight: FontWeight.w700,
                                           ),
                                         ),
                                         backgroundColor:
-                                            Colors.green.withValues(alpha: 0.35),
+                                            accent.withValues(alpha: 0.18),
                                       ),
                                       Chip(
                                         label: Text(createdBy),
                                         labelStyle: const TextStyle(
-                                          color: Colors.white,
+                                          color: textSecondary,
                                           fontWeight: FontWeight.w600,
                                         ),
                                         backgroundColor:
-                                            Colors.blueGrey.withValues(alpha: 0.4),
+                                            Colors.grey.withValues(alpha: 0.2),
                                       ),
                                       if (important)
                                         Chip(
                                           avatar: const Icon(
                                             Icons.priority_high,
                                             size: 18,
-                                            color: Colors.white,
+                                            color: Color(0xFF8B5E00),
                                           ),
                                           label: const Text(
                                             "Penting",
                                             style: TextStyle(
-                                              color: Colors.white,
+                                              color: textPrimary,
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),
@@ -348,7 +352,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                   Text(
                                     "Tanggal: ${item['date']}",
                                     style: const TextStyle(
-                                      color: Colors.white70,
+                                      color: textSecondary,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -360,7 +364,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                       children: [
                                         const Icon(
                                           Icons.notes_rounded,
-                                          color: Colors.white70,
+                                          color: textSecondary,
                                           size: 16,
                                         ),
                                         const SizedBox(width: 6),
@@ -368,7 +372,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                           child: Text(
                                             note,
                                             style: const TextStyle(
-                                              color: Colors.white70,
+                                              color: textSecondary,
                                               fontSize: 13,
                                             ),
                                           ),

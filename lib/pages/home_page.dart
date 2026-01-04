@@ -92,29 +92,48 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> _openScanStruk() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const TambahTransaksiPage(
+          role: UserRole.user,
+          autoScanOnStart: true,
+        ),
+      ),
+    );
+
+    if (result == true) {
+      _loadHistory();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    const Color background = Color(0xFF0B1023);
-    const Color surface = Color(0xFF121A32);
-    const Color accent = Color(0xFF6BD1FF);
+    const Color background = Colors.white;
+    const Color surface = Color(0xFFF6F8FB);
+    const Color accent = Color(0xFF2ECC71);
+    const Color accentYellow = Color(0xFFF7C948);
+    const Color textPrimary = Color(0xFF1F2933);
+    const Color textSecondary = Color(0xFF52616B);
 
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
         title: Text(
           "Transaksi Harian",
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: textPrimary,
           ),
         ),
         actions: [
           IconButton(
             onPressed: _openHistory,
-            icon: const Icon(Icons.timeline_rounded, color: Colors.white),
+            icon: const Icon(Icons.timeline_rounded, color: Color(0xFF52616B)),
             tooltip: "Lihat history",
           )
         ],
@@ -124,12 +143,12 @@ class _HomePageState extends State<HomePage> {
         icon: const Icon(Icons.add_rounded),
         label: const Text("Transaksi Baru"),
         backgroundColor: accent,
-        foregroundColor: Colors.black,
+        foregroundColor: Colors.white,
       ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF0B1023), Color(0xFF0E1C3A)],
+            colors: [Colors.white, Color(0xFFFAFCEA)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -148,15 +167,22 @@ class _HomePageState extends State<HomePage> {
                     _HeroCard(
                       background: surface,
                       accent: accent,
+                      accentYellow: accentYellow,
+                      textPrimary: textPrimary,
+                      textSecondary: textSecondary,
                       totalAmount: _totalAmount,
                       totalTransactions: _totalTransactions,
                       lastTransaction: _lastTransactionTitle,
                       onAddTap: _openTambahTransaksi,
+                      onScanTap: _openScanStruk,
                     ),
                     const SizedBox(height: 18),
                     _QuickActions(
                       surface: surface,
                       accent: accent,
+                      textPrimary: textPrimary,
+                      textSecondary: textSecondary,
+                      onScan: _openScanStruk,
                       onTambah: _openTambahTransaksi,
                       onHistory: _openHistory,
                     ),
@@ -164,6 +190,8 @@ class _HomePageState extends State<HomePage> {
                     _StatsRow(
                       surface: surface,
                       accent: accent,
+                      textPrimary: textPrimary,
+                      textSecondary: textSecondary,
                       totalAmount: _totalAmount,
                       totalTransactions: _totalTransactions,
                       lastTransaction: _lastTransactionTitle,
@@ -172,6 +200,9 @@ class _HomePageState extends State<HomePage> {
                     _MomentumPanel(
                       surface: surface,
                       accent: accent,
+                      accentYellow: accentYellow,
+                      textPrimary: textPrimary,
+                      textSecondary: textSecondary,
                       amounts: _recentAmounts,
                       onAdd: _openTambahTransaksi,
                       onHistory: _openHistory,
@@ -180,6 +211,8 @@ class _HomePageState extends State<HomePage> {
                     _RecentList(
                       surface: surface,
                       accent: accent,
+                      textPrimary: textPrimary,
+                      textSecondary: textSecondary,
                       loading: _loading,
                       history: _history,
                       onShowAll: _openHistory,
@@ -198,18 +231,26 @@ class _HomePageState extends State<HomePage> {
 class _HeroCard extends StatelessWidget {
   final Color background;
   final Color accent;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color accentYellow;
   final int totalAmount;
   final int totalTransactions;
   final String lastTransaction;
   final VoidCallback onAddTap;
+  final VoidCallback onScanTap;
 
   const _HeroCard({
     required this.background,
     required this.accent,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.accentYellow,
     required this.totalAmount,
     required this.totalTransactions,
     required this.lastTransaction,
     required this.onAddTap,
+    required this.onScanTap,
   });
 
   @override
@@ -219,18 +260,22 @@ class _HeroCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       height: 200,
       decoration: BoxDecoration(
-        color: background.withValues(alpha: 0.65),
+        color: background,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1D2B64), Color(0xFF1B2240)],
+        border: Border.all(color: accent.withValues(alpha: 0.1)),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFE8F7EF),
+            Colors.white,
+            const Color(0xFFFFF3C4),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 20,
+            color: accent.withValues(alpha: 0.15),
+            blurRadius: 24,
             offset: const Offset(0, 10),
           )
         ],
@@ -271,7 +316,7 @@ class _HeroCard extends StatelessWidget {
                   Text(
                     "Ringkasan Hari Ini",
                     style: GoogleFonts.poppins(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: textSecondary,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -280,7 +325,7 @@ class _HeroCard extends StatelessWidget {
                   Text(
                     "Rp $total",
                     style: GoogleFonts.poppins(
-                      color: Colors.white,
+                      color: textPrimary,
                       fontSize: 26,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.3,
@@ -293,35 +338,57 @@ class _HeroCard extends StatelessWidget {
                         label: "$totalTransactions transaksi",
                         icon: Icons.check_circle_outline,
                         accent: accent,
+                        textColor: textPrimary,
                       ),
                       const SizedBox(width: 8),
                       _MiniPill(
                         label: lastTransaction,
                         icon: Icons.flash_on_rounded,
-                        accent: Colors.white70,
+                        accent: accentYellow,
+                        textColor: textPrimary,
                       ),
                     ],
                   ),
                 ],
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: onAddTap,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: accent,
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.end,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: onScanTap,
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: accent),
+                          foregroundColor: textPrimary,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 14,
+                          ),
+                        ),
+                        icon:
+                            Icon(Icons.qr_code_scanner_rounded, color: accent),
+                        label: const Text("Scan struk"),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 16,
+                      ElevatedButton.icon(
+                        onPressed: onAddTap,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: accent,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 16,
+                          ),
+                        ),
+                        icon: const Icon(Icons.add_rounded),
+                        label: const Text("Tambah manual"),
                       ),
-                    ),
-                    icon: const Icon(Icons.add_rounded),
-                    label: const Text("Tambah transaksi"),
+                    ],
                   ),
                 ],
               ),
@@ -336,40 +403,57 @@ class _HeroCard extends StatelessWidget {
 class _QuickActions extends StatelessWidget {
   final Color surface;
   final Color accent;
+  final Color textPrimary;
+  final Color textSecondary;
+  final VoidCallback onScan;
   final VoidCallback onTambah;
   final VoidCallback onHistory;
 
   const _QuickActions({
     required this.surface,
     required this.accent,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.onScan,
     required this.onTambah,
     required this.onHistory,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
       children: [
-        Expanded(
-          child: _ActionTile(
-            title: "Input cepat",
-            subtitle: "Tambah transaksi baru",
-            icon: Icons.edit_rounded,
-            surface: surface,
-            accent: accent,
-            onTap: onTambah,
-          ),
+        _ActionTile(
+          title: "Scan struk",
+          subtitle: "Isi otomatis dari foto",
+          icon: Icons.qr_code_scanner_rounded,
+          surface: surface,
+          accent: accent,
+          textPrimary: textPrimary,
+          textSecondary: textSecondary,
+          onTap: onScan,
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _ActionTile(
-            title: "History",
-            subtitle: "Lihat catatan lengkap",
-            icon: Icons.history_rounded,
-            surface: surface,
-            accent: Colors.white70,
-            onTap: onHistory,
-          ),
+        _ActionTile(
+          title: "Input cepat",
+          subtitle: "Tambah manual",
+          icon: Icons.edit_rounded,
+          surface: surface,
+          accent: accent,
+          textPrimary: textPrimary,
+          textSecondary: textSecondary,
+          onTap: onTambah,
+        ),
+        _ActionTile(
+          title: "History",
+          subtitle: "Lihat catatan lengkap",
+          icon: Icons.history_rounded,
+          surface: surface,
+          accent: accent,
+          textPrimary: textPrimary,
+          textSecondary: textSecondary,
+          onTap: onHistory,
         ),
       ],
     );
@@ -382,6 +466,8 @@ class _ActionTile extends StatelessWidget {
   final IconData icon;
   final Color surface;
   final Color accent;
+  final Color textPrimary;
+  final Color textSecondary;
   final VoidCallback onTap;
 
   const _ActionTile({
@@ -390,26 +476,36 @@ class _ActionTile extends StatelessWidget {
     required this.icon,
     required this.surface,
     required this.accent,
+    required this.textPrimary,
+    required this.textSecondary,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
+    final maxCardWidth = MediaQuery.sizeOf(context).width - 20;
+    final card = ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxCardWidth),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: surface.withValues(alpha: 0.75),
+          color: surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+          border: Border.all(color: accent.withValues(alpha: 0.08)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            )
+          ],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.15),
+                color: accent.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: accent),
@@ -422,7 +518,7 @@ class _ActionTile extends StatelessWidget {
                   Text(
                     title,
                     style: GoogleFonts.poppins(
-                      color: Colors.white,
+                      color: textPrimary,
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
                     ),
@@ -431,7 +527,7 @@ class _ActionTile extends StatelessWidget {
                   Text(
                     subtitle,
                     style: GoogleFonts.poppins(
-                      color: Colors.white70,
+                      color: textSecondary,
                       fontSize: 12,
                     ),
                   ),
@@ -442,12 +538,16 @@ class _ActionTile extends StatelessWidget {
         ),
       ),
     );
+
+    return GestureDetector(onTap: onTap, child: card);
   }
 }
 
 class _StatsRow extends StatelessWidget {
   final Color surface;
   final Color accent;
+  final Color textPrimary;
+  final Color textSecondary;
   final int totalAmount;
   final int totalTransactions;
   final String lastTransaction;
@@ -455,6 +555,8 @@ class _StatsRow extends StatelessWidget {
   const _StatsRow({
     required this.surface,
     required this.accent,
+    required this.textPrimary,
+    required this.textSecondary,
     required this.totalAmount,
     required this.totalTransactions,
     required this.lastTransaction,
@@ -475,6 +577,8 @@ class _StatsRow extends StatelessWidget {
             icon: Icons.list_alt_rounded,
             surface: surface,
             accent: accent,
+            textPrimary: textPrimary,
+            textSecondary: textSecondary,
           ),
         ),
         const SizedBox(width: 12),
@@ -485,6 +589,8 @@ class _StatsRow extends StatelessWidget {
             icon: Icons.leaderboard_rounded,
             surface: surface,
             accent: Colors.orangeAccent,
+            textPrimary: textPrimary,
+            textSecondary: textSecondary,
           ),
         ),
       ],
@@ -498,6 +604,8 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final Color surface;
   final Color accent;
+  final Color textPrimary;
+  final Color textSecondary;
 
   const _StatCard({
     required this.title,
@@ -505,6 +613,8 @@ class _StatCard extends StatelessWidget {
     required this.icon,
     required this.surface,
     required this.accent,
+    required this.textPrimary,
+    required this.textSecondary,
   });
 
   @override
@@ -512,9 +622,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: surface.withValues(alpha: 0.8),
+        color: surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(color: accent.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -522,7 +632,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.15),
+              color: accent.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: accent, size: 20),
@@ -531,7 +641,7 @@ class _StatCard extends StatelessWidget {
           Text(
             title,
             style: GoogleFonts.poppins(
-              color: Colors.white70,
+              color: textSecondary,
               fontSize: 12,
             ),
           ),
@@ -539,7 +649,7 @@ class _StatCard extends StatelessWidget {
           Text(
             value,
             style: GoogleFonts.poppins(
-              color: Colors.white,
+              color: textPrimary,
               fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
@@ -553,6 +663,9 @@ class _StatCard extends StatelessWidget {
 class _MomentumPanel extends StatelessWidget {
   final Color surface;
   final Color accent;
+  final Color accentYellow;
+  final Color textPrimary;
+  final Color textSecondary;
   final List<int> amounts;
   final VoidCallback onAdd;
   final VoidCallback onHistory;
@@ -560,6 +673,9 @@ class _MomentumPanel extends StatelessWidget {
   const _MomentumPanel({
     required this.surface,
     required this.accent,
+    required this.accentYellow,
+    required this.textPrimary,
+    required this.textSecondary,
     required this.amounts,
     required this.onAdd,
     required this.onHistory,
@@ -579,18 +695,22 @@ class _MomentumPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E2A55), Color(0xFF111A33)],
+        gradient: LinearGradient(
+          colors: [
+            Colors.white,
+            const Color(0xFFEAF8F0),
+            const Color(0xFFFFF8DD),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        border: Border.all(color: accent.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
-            color: accent.withValues(alpha: 0.18),
-            blurRadius: 26,
-            offset: const Offset(0, 16),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           )
         ],
       ),
@@ -606,7 +726,7 @@ class _MomentumPanel extends StatelessWidget {
                   Text(
                     "Momentum",
                     style: GoogleFonts.poppins(
-                      color: Colors.white,
+                      color: textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
@@ -617,7 +737,7 @@ class _MomentumPanel extends StatelessWidget {
                         ? "7 transaksi terakhir, real time"
                         : "Belum ada data, ayo isi satu transaksi",
                     style: GoogleFonts.poppins(
-                      color: Colors.white70,
+                      color: textSecondary,
                       fontSize: 12,
                     ),
                   ),
@@ -627,7 +747,7 @@ class _MomentumPanel extends StatelessWidget {
                 onPressed: hasData ? onHistory : onAdd,
                 icon: Icon(
                   hasData ? Icons.auto_graph_rounded : Icons.bolt_rounded,
-                  color: Colors.white,
+                  color: accent,
                 ),
                 tooltip: hasData ? "Buka history" : "Tambah transaksi",
               )
@@ -640,8 +760,8 @@ class _MomentumPanel extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               child: Container(
                 decoration: BoxDecoration(
-                  color: surface.withValues(alpha: 0.45),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.04)),
+                  color: surface,
+                  border: Border.all(color: accent.withValues(alpha: 0.08)),
                 ),
                 child: hasData
                     ? _Sparkline(amounts: amounts, accent: accent)
@@ -669,13 +789,13 @@ class _MomentumPanel extends StatelessWidget {
                 children: [
                   Icon(
                     trendingUp ? Icons.trending_up : Icons.trending_down,
-                    color: trendingUp ? Colors.greenAccent : Colors.orangeAccent,
+                    color: trendingUp ? accent : Colors.orangeAccent,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     "${trendingUp ? 'Laju naik' : 'Laju turun'} ${displayMomentum.abs().toStringAsFixed(0)}%",
                     style: GoogleFonts.poppins(
-                      color: Colors.white,
+                      color: textPrimary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -690,18 +810,21 @@ class _MomentumPanel extends StatelessWidget {
                 label: "Total 7 terakhir",
                 value: "Rp ${formatRupiahInt(total)}",
                 color: accent,
+                textSecondary: textSecondary,
               ),
               const SizedBox(width: 8),
               _MetricChip(
                 label: "Rata-rata",
                 value: "Rp ${formatRupiahInt(avg)}",
                 color: Colors.cyanAccent,
+                textSecondary: textSecondary,
               ),
               const SizedBox(width: 8),
               _MetricChip(
                 label: "Puncak",
                 value: "Rp ${formatRupiahInt(best)}",
-                color: Colors.amberAccent,
+                color: accentYellow,
+                textSecondary: textSecondary,
               ),
             ],
           )
@@ -798,11 +921,13 @@ class _MetricChip extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
+  final Color textSecondary;
 
   const _MetricChip({
     required this.label,
     required this.value,
     required this.color,
+    required this.textSecondary,
   });
 
   @override
@@ -811,9 +936,9 @@ class _MetricChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.06),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -821,7 +946,7 @@ class _MetricChip extends StatelessWidget {
             Text(
               label,
               style: GoogleFonts.poppins(
-                color: Colors.white60,
+                color: textSecondary,
                 fontSize: 11,
               ),
             ),
@@ -862,8 +987,8 @@ class _BrandBackdropPainter extends CustomPainter {
     final bgPaint = Paint()
       ..shader = LinearGradient(
         colors: [
-          const Color(0xFF0B1023).withValues(alpha: 0.0),
-          const Color(0xFF1E2A55).withValues(alpha: 0.12),
+          Colors.white.withValues(alpha: 0.0),
+          const Color(0xFFE8F7EF).withValues(alpha: 0.35),
         ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -872,7 +997,7 @@ class _BrandBackdropPainter extends CustomPainter {
 
     final glowShader = RadialGradient(
       colors: [
-        const Color(0xFF6BD1FF).withValues(alpha: 0.12),
+        const Color(0xFF2ECC71).withValues(alpha: 0.16),
         Colors.transparent,
       ],
       stops: const [0.0, 1.0],
@@ -884,7 +1009,7 @@ class _BrandBackdropPainter extends CustomPainter {
 
     final glowShader2 = RadialGradient(
       colors: [
-        Colors.purpleAccent.withValues(alpha: 0.09),
+        const Color(0xFFF7C948).withValues(alpha: 0.12),
         Colors.transparent,
       ],
       stops: const [0.0, 1.0],
@@ -934,6 +1059,8 @@ class _BrandBackdropPainter extends CustomPainter {
 class _RecentList extends StatelessWidget {
   final Color surface;
   final Color accent;
+  final Color textPrimary;
+  final Color textSecondary;
   final bool loading;
   final List<Map<String, dynamic>> history;
   final VoidCallback onShowAll;
@@ -941,6 +1068,8 @@ class _RecentList extends StatelessWidget {
   const _RecentList({
     required this.surface,
     required this.accent,
+    required this.textPrimary,
+    required this.textSecondary,
     required this.loading,
     required this.history,
     required this.onShowAll,
@@ -957,7 +1086,7 @@ class _RecentList extends StatelessWidget {
             Text(
               "Aktivitas terbaru",
               style: GoogleFonts.poppins(
-                color: Colors.white,
+                color: textPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -981,9 +1110,9 @@ class _RecentList extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: surface.withValues(alpha: 0.7),
+              color: surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+              border: Border.all(color: accent.withValues(alpha: 0.08)),
             ),
             child: Row(
               children: [
@@ -991,15 +1120,15 @@ class _RecentList extends StatelessWidget {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: accent.withValues(alpha: 0.12),
                   ),
-                  child: const Icon(Icons.inbox_rounded, color: Colors.white70),
+                  child: Icon(Icons.inbox_rounded, color: textSecondary),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     "Belum ada transaksi tersimpan. Yuk mulai catat transaksi pertama!",
-                    style: GoogleFonts.poppins(color: Colors.white70),
+                    style: GoogleFonts.poppins(color: textSecondary),
                   ),
                 ),
               ],
@@ -1017,21 +1146,21 @@ class _RecentList extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: surface.withValues(alpha: 0.78),
+                  color: surface,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                  border: Border.all(color: accent.withValues(alpha: 0.08)),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: accent.withValues(alpha: 0.18),
+                        color: accent.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.payments_rounded,
-                        color: Colors.white,
+                        color: accent,
                         size: 22,
                       ),
                     ),
@@ -1043,7 +1172,7 @@ class _RecentList extends StatelessWidget {
                           Text(
                             name,
                             style: GoogleFonts.poppins(
-                              color: Colors.white,
+                              color: textPrimary,
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
@@ -1058,13 +1187,13 @@ class _RecentList extends StatelessWidget {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.1),
+                                  color: accent.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
                                   category,
                                   style: GoogleFonts.poppins(
-                                    color: Colors.white,
+                                    color: textPrimary,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -1078,7 +1207,7 @@ class _RecentList extends StatelessWidget {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.amber.withValues(alpha: 0.3),
+                                  color: Colors.amber.withValues(alpha: 0.28),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Row(
@@ -1086,14 +1215,14 @@ class _RecentList extends StatelessWidget {
                                   children: [
                                     const Icon(
                                       Icons.star_rounded,
-                                      color: Colors.black87,
+                                      color: Color(0xFF8B5E00),
                                       size: 14,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
                                       "Penting",
                                       style: GoogleFonts.poppins(
-                                        color: Colors.black,
+                                        color: textPrimary,
                                         fontWeight: FontWeight.w700,
                                         fontSize: 12,
                                       ),
@@ -1108,7 +1237,7 @@ class _RecentList extends StatelessWidget {
                         Text(
                           date,
                           style: GoogleFonts.poppins(
-                            color: Colors.white60,
+                            color: textSecondary,
                               fontSize: 12,
                             ),
                           ),
@@ -1118,7 +1247,7 @@ class _RecentList extends StatelessWidget {
                     Text(
                       "Rp $nominal",
                       style: GoogleFonts.poppins(
-                        color: Colors.greenAccent,
+                        color: accent,
                         fontWeight: FontWeight.w700,
                         fontSize: 14,
                       ),
@@ -1137,11 +1266,13 @@ class _MiniPill extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color accent;
+  final Color textColor;
 
   const _MiniPill({
     required this.label,
     required this.icon,
     required this.accent,
+    this.textColor = const Color(0xFF1F2933),
   });
 
   @override
@@ -1149,9 +1280,9 @@ class _MiniPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: accent.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        border: Border.all(color: accent.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1161,10 +1292,12 @@ class _MiniPill extends StatelessWidget {
           Text(
             label,
             style: GoogleFonts.poppins(
-              color: accent,
+              color: textColor,
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           )
         ],
       ),

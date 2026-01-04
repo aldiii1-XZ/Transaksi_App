@@ -72,6 +72,10 @@ class _OwnerPageState extends State<OwnerPage> {
   @override
   Widget build(BuildContext context) {
     final latest = _latest;
+    const textPrimary = Color(0xFF1F2933);
+    const textSecondary = Color(0xFF52616B);
+    const surface = Color(0xFFF6F8FB);
+    const accent = Color(0xFF2ECC71);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Menu Owner')),
@@ -95,6 +99,9 @@ class _OwnerPageState extends State<OwnerPage> {
                       total: formatRupiahInt(_totalAmount),
                       totalTransactions: _history.length,
                       importantCount: _importantCount,
+                      textPrimary: textPrimary,
+                      textSecondary: textSecondary,
+                      surface: surface,
                     ),
                     const SizedBox(height: 16),
                     if (latest != null)
@@ -107,17 +114,21 @@ class _OwnerPageState extends State<OwnerPage> {
                         category: latest['category']?.toString() ?? "Lainnya",
                         createdBy:
                             userRoleFromString(latest['createdBy']).label,
+                        textPrimary: textPrimary,
+                        textSecondary: textSecondary,
+                        surface: surface,
+                        accent: accent,
                       )
                     else
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.08),
+                          color: surface,
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Belum ada transaksi. Owner hanya membaca data.",
-                          style: TextStyle(color: Colors.white70),
+                          style: TextStyle(color: textSecondary),
                         ),
                       ),
                     const Spacer(),
@@ -152,11 +163,17 @@ class _SummaryCard extends StatelessWidget {
   final String total;
   final int totalTransactions;
   final int importantCount;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color surface;
 
   const _SummaryCard({
     required this.total,
     required this.totalTransactions,
     required this.importantCount,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.surface,
   });
 
   @override
@@ -164,22 +181,22 @@ class _SummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.07),
+        color: surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.04)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Total Nominal",
-            style: TextStyle(color: Colors.white70),
+            style: TextStyle(color: textSecondary),
           ),
           const SizedBox(height: 6),
           Text(
             "Rp $total",
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: textPrimary,
               fontSize: 20,
               fontWeight: FontWeight.w700,
             ),
@@ -210,12 +227,12 @@ class _SummaryCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white70)),
+        Text(label, style: TextStyle(color: textSecondary)),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: textPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w700,
           ),
@@ -231,6 +248,10 @@ class _LatestCard extends StatelessWidget {
   final String amount;
   final String category;
   final String createdBy;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color surface;
+  final Color accent;
 
   const _LatestCard({
     required this.title,
@@ -238,6 +259,10 @@ class _LatestCard extends StatelessWidget {
     required this.amount,
     required this.category,
     required this.createdBy,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.surface,
+    required this.accent,
   });
 
   @override
@@ -245,21 +270,21 @@ class _LatestCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.07),
+        color: surface,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Transaksi Terbaru",
-            style: TextStyle(color: Colors.white70),
+            style: TextStyle(color: textSecondary),
           ),
           const SizedBox(height: 10),
           Text(
             title,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: textPrimary,
               fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
@@ -271,25 +296,25 @@ class _LatestCard extends StatelessWidget {
             children: [
               Chip(
                 label: Text("Rp $amount"),
-                backgroundColor: Colors.green.withValues(alpha: 0.3),
-                labelStyle: const TextStyle(
-                  color: Colors.white,
+                backgroundColor: accent.withValues(alpha: 0.15),
+                labelStyle: TextStyle(
+                  color: textPrimary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               Chip(
                 label: Text(category),
                 backgroundColor: Colors.white,
-                labelStyle: const TextStyle(
-                  color: Colors.black87,
+                labelStyle: TextStyle(
+                  color: textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               Chip(
                 label: Text(createdBy),
-                backgroundColor: Colors.blueGrey.withValues(alpha: 0.35),
-                labelStyle: const TextStyle(
-                  color: Colors.white,
+                backgroundColor: Colors.grey.withValues(alpha: 0.15),
+                labelStyle: TextStyle(
+                  color: textSecondary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -298,7 +323,7 @@ class _LatestCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             date,
-            style: const TextStyle(color: Colors.white70),
+            style: TextStyle(color: textSecondary),
           )
         ],
       ),

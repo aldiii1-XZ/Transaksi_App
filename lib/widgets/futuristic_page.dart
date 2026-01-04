@@ -15,22 +15,24 @@ class FuturisticPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const textPrimary = Color(0xFF1F2933);
     return Scaffold(
-      backgroundColor: const Color(0xff0A0F1F),
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: showBack
             ? IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+                icon: const Icon(Icons.arrow_back_ios_new,
+                    color: Color(0xFF52616B)),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
         title: Text(
           title,
           style: GoogleFonts.poppins(
-            color: Colors.white,
+            color: textPrimary,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -42,8 +44,8 @@ class FuturisticPage extends StatelessWidget {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xff0A0F1F),
-                Color(0xff131B2E),
+                Colors.white,
+                Color(0xFFF5FFE9),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,

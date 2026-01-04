@@ -26,17 +26,17 @@ class TransaksiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseTheme = ThemeData(
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF6BD1FF),
-        brightness: Brightness.dark,
+        seedColor: const Color(0xFF2ECC71),
+        brightness: Brightness.light,
       ),
-      scaffoldBackgroundColor: const Color(0xFF0B1023),
+      scaffoldBackgroundColor: Colors.white,
       appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: Color(0xFF1F2933),
       ),
     );
 
@@ -44,8 +44,10 @@ class TransaksiApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: "Transaksi Aldi",
       theme: baseTheme.copyWith(
-        textTheme: GoogleFonts.poppinsTextTheme(baseTheme.textTheme)
-            .apply(bodyColor: Colors.white, displayColor: Colors.white),
+        textTheme: GoogleFonts.poppinsTextTheme(baseTheme.textTheme).apply(
+          bodyColor: const Color(0xFF1F2933),
+          displayColor: const Color(0xFF1F2933),
+        ),
       ),
       home: const RoleSelectPage(),
     );

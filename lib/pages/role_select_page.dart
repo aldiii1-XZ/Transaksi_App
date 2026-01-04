@@ -13,7 +13,7 @@ class RoleSelectPage extends StatelessWidget {
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF0B1023), Color(0xFF111A33)],
+              colors: [Colors.white, Color(0xFFF5FFE9)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -26,7 +26,7 @@ class RoleSelectPage extends StatelessWidget {
                 const Text(
                   "Pilih Mode",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color(0xFF1F2933),
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                   ),
@@ -34,7 +34,7 @@ class RoleSelectPage extends StatelessWidget {
                 const SizedBox(height: 8),
                 const Text(
                   "Masuk sebagai owner, admin, atau pengguna biasa.",
-                  style: TextStyle(color: Colors.white70),
+                  style: TextStyle(color: Color(0xFF52616B)),
                 ),
                 const SizedBox(height: 24),
                 Expanded(
@@ -103,14 +103,14 @@ class _RoleCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.06),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
           boxShadow: [
             BoxShadow(
-              color: color.withValues(alpha: 0.1),
-              blurRadius: 18,
-              offset: const Offset(0, 10),
+              color: color.withValues(alpha: 0.22),
+              blurRadius: 16,
+              offset: const Offset(0, 12),
             ),
           ],
         ),
@@ -119,7 +119,7 @@ class _RoleCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.18),
+                color: color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: color, size: 26),
@@ -132,7 +132,7 @@ class _RoleCard extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFF1F2933),
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
@@ -140,12 +140,15 @@ class _RoleCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    style: const TextStyle(
+                      color: Color(0xFF52616B),
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Colors.white70)
+            const Icon(Icons.chevron_right, color: Color(0xFF52616B))
           ],
         ),
       ),
